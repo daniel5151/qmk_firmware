@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>massdrop alt testing</title>
+</head>
+<body>
+  <canvas id="maincanvas"></canvas>
+  <style type="text/css">
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+    }
+  </style>
+  <script type="text/javascript">
+    // Keyboard data
+    var kbd_leds = [
+      { "id":1,   "x":0,      "y":0,      },
+      { "id":2,   "x":0.75,   "y":0,      },
+      { "id":3,   "x":1.5,    "y":0,      },
+      { "id":4,   "x":2.25,   "y":0,      },
+      { "id":5,   "x":3,      "y":0,      },
+      { "id":6,   "x":3.75,   "y":0,      },
+      { "id":7,   "x":4.5,    "y":0,      },
+      { "id":8,   "x":5.25,   "y":0,      },
+      { "id":9,   "x":6,      "y":0,      },
+      { "id":10,  "x":6.75,   "y":0,      },
+      { "id":11,  "x":7.5,    "y":0,      },
+      { "id":12,  "x":8.25,   "y":0,      },
+      { "id":13,  "x":9,      "y":0,      },
+      { "id":14,  "x":10.125, "y":0,      },
+      { "id":15,  "x":11.25,  "y":0,      },
+      { "id":16,  "x":0.188,  "y":-0.75,  },
+      { "id":17,  "x":1.125,  "y":-0.75,  },
+      { "id":18,  "x":1.875,  "y":-0.75,  },
+      { "id":19,  "x":2.625,  "y":-0.75,  },
+      { "id":20,  "x":3.375,  "y":-0.75,  },
+      { "id":21,  "x":4.125,  "y":-0.75,  },
+      { "id":22,  "x":4.875,  "y":-0.75,  },
+      { "id":23,  "x":5.625,  "y":-0.75,  },
+      { "id":24,  "x":6.375,  "y":-0.75,  },
+      { "id":25,  "x":7.125,  "y":-0.75,  },
+      { "id":26,  "x":7.875,  "y":-0.75,  },
+      { "id":27,  "x":8.625,  "y":-0.75,  },
+      { "id":28,  "x":9.375,  "y":-0.75,  },
+      { "id":29,  "x":10.313, "y":-0.75,  },
+      { "id":30,  "x":11.25,  "y":-0.75,  },
+      { "id":31,  "x":0.281,  "y":-1.5,   },
+      { "id":32,  "x":1.313,  "y":-1.5,   },
+      { "id":33,  "x":2.063,  "y":-1.5,   },
+      { "id":34,  "x":2.813,  "y":-1.5,   },
+      { "id":35,  "x":3.563,  "y":-1.5,   },
+      { "id":36,  "x":4.313,  "y":-1.5,   },
+      { "id":37,  "x":5.063,  "y":-1.5,   },
+      { "id":38,  "x":5.813,  "y":-1.5,   },
+      { "id":39,  "x":6.563,  "y":-1.5,   },
+      { "id":40,  "x":7.313,  "y":-1.5,   },
+      { "id":41,  "x":8.063,  "y":-1.5,   },
+      { "id":42,  "x":8.813,  "y":-1.5,   },
+      { "id":43,  "x":10.031, "y":-1.5,   },
+      { "id":44,  "x":11.25,  "y":-1.5,   },
+      { "id":45,  "x":0.469,  "y":-2.25,  },
+      { "id":46,  "x":1.688,  "y":-2.25,  },
+      { "id":47,  "x":2.438,  "y":-2.25,  },
+      { "id":48,  "x":3.188,  "y":-2.25,  },
+      { "id":49,  "x":3.938,  "y":-2.25,  },
+      { "id":50,  "x":4.688,  "y":-2.25,  },
+      { "id":51,  "x":5.438,  "y":-2.25,  },
+      { "id":52,  "x":6.188,  "y":-2.25,  },
+      { "id":53,  "x":6.938,  "y":-2.25,  },
+      { "id":54,  "x":7.688,  "y":-2.25,  },
+      { "id":55,  "x":8.438,  "y":-2.25,  },
+      { "id":56,  "x":9.469,  "y":-2.25,  },
+      { "id":57,  "x":10.5,   "y":-2.25,  },
+      { "id":58,  "x":11.25,  "y":-2.25,  },
+      { "id":59,  "x":0.094,  "y":-3,     },
+      { "id":60,  "x":1.031,  "y":-3,     },
+      { "id":61,  "x":1.969,  "y":-3,     },
+      { "id":62,  "x":4.781,  "y":-3,     },
+      { "id":63,  "x":7.594,  "y":-3,     },
+      { "id":64,  "x":8.531,  "y":-3,     },
+      { "id":65,  "x":9.75,   "y":-3,     },
+      { "id":66,  "x":10.5,   "y":-3,     },
+      { "id":67,  "x":11.25,  "y":-3,     },
+      { "id":68,  "x":-0.338, "y":-3.338, },
+      { "id":69,  "x":0.39,   "y":-3.443, },
+      { "id":70,  "x":1.263,  "y":-3.443, },
+      { "id":71,  "x":2.135,  "y":-3.443, },
+      { "id":72,  "x":3.008,  "y":-3.443, },
+      { "id":73,  "x":3.88,   "y":-3.443, },
+      { "id":74,  "x":4.753,  "y":-3.443, },
+      { "id":75,  "x":5.625,  "y":-3.443, },
+      { "id":76,  "x":6.497,  "y":-3.443, },
+      { "id":77,  "x":7.37,   "y":-3.443, },
+      { "id":78,  "x":8.242,  "y":-3.443, },
+      { "id":79,  "x":9.115,  "y":-3.443, },
+      { "id":80,  "x":9.987,  "y":-3.443, },
+      { "id":81,  "x":10.86,  "y":-3.443, },
+      { "id":82,  "x":11.588, "y":-3.338, },
+      { "id":83,  "x":11.693, "y":-2.623, },
+      { "id":84,  "x":11.693, "y":-1.873, },
+      { "id":85,  "x":11.693, "y":-1.123, },
+      { "id":86,  "x":11.693, "y":-0.373, },
+      { "id":87,  "x":11.588, "y":0.338,  },
+      { "id":88,  "x":9.908,  "y":0.443,  },
+      { "id":89,  "x":9.288,  "y":0.443,  },
+      { "id":90,  "x":8.625,  "y":0.443,  },
+      { "id":91,  "x":7.875,  "y":0.443,  },
+      { "id":92,  "x":7.125,  "y":0.443,  },
+      { "id":93,  "x":6.375,  "y":0.443,  },
+      { "id":94,  "x":5.625,  "y":0.443,  },
+      { "id":95,  "x":4.875,  "y":0.443,  },
+      { "id":96,  "x":4.125,  "y":0.443,  },
+      { "id":97,  "x":3.375,  "y":0.443,  },
+      { "id":98,  "x":2.625,  "y":0.443,  },
+      { "id":99,  "x":1.875,  "y":0.443,  },
+      { "id":100, "x":1.125,  "y":0.443,  },
+      { "id":101, "x":-0.338, "y":0.338,  },
+      { "id":102, "x":-0.443, "y":-0.373, },
+      { "id":103, "x":-0.443, "y":-1.123, },
+      { "id":104, "x":-0.443, "y":-1.873, },
+      { "id":105, "x":-0.443, "y":-2.623, }
+    ];
+  </script>
+  <script type="text/javascript">
+    const canvas = document.getElementById("maincanvas");
+    const ctx = canvas.getContext("2d");
+
+    ctx.canvas.width  = window.innerWidth;
+    ctx.canvas.height = window.innerHeight;
+
+    function draw_led(id, x, y, r, color) {
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, 2 * Math.PI);
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.font = "12px Monospace";
+      ctx.fillText(id, x + 6, y);
+    }
+
+    key_kbd_leds = kbd_leds;//.filter(({id}) => id < 68) // get rid of edge LEDs
+
+    // generate adjacencies
+    const adjacencies = {}; // <id, [up, down, left, right]>
+    for (let i = 1; i < key_kbd_leds.length + 1; i++)
+      adjacencies[i] = [255, 255, 255, 255];
+
+    const UP = 0;
+    const DOWN = 1;
+    const LEFT = 2;
+    const RIGHT = 3;
+
+    key_kbd_leds.map(({id, x, y}) => {
+      // handle horizontal connections
+      switch(id) {
+      case 15: break;
+      case 30: break;
+      case 44: break;
+      case 58: break;
+      case 67: break;
+
+      case 105:
+        adjacencies[id][RIGHT] = 68;
+        adjacencies[68][LEFT] = id;
+        break;
+
+      default:
+        adjacencies[id][RIGHT] = id + 1;
+        adjacencies[id + 1][LEFT] = id;
+        break;
+      }
+
+      // handle vertical connections
+
+      switch (true) {
+      case (id <= 15): break;
+
+      case (id <= 30):
+        adjacencies[id][UP] = id - 15;
+        adjacencies[id - 15][DOWN] = id;
+        break;
+
+      case (id <= 42):
+        adjacencies[id][UP] = id - 15;
+        adjacencies[id - 15][DOWN] = id;
+        break;
+
+      case (id === 43 || id === 44):
+        adjacencies[id][UP] = id - 14;
+        adjacencies[id - 14][DOWN] = id;
+        break;
+
+      // TODO: gameplay test this area (the enter-shift-top arrow key)
+      case (id <= 58):
+        adjacencies[id][UP] = id - 14;
+        adjacencies[id - 14][DOWN] = id;
+        break;
+
+      case (id === 59):
+        adjacencies[id][UP] = id - 14;
+        adjacencies[id - 14][DOWN] = id;
+        break;
+
+      case (id === 60): break;
+
+      case (id === 61):
+        adjacencies[id][UP] = 46;
+        adjacencies[46][DOWN] = id;
+        break;
+
+      case (id === 62):
+        adjacencies[id][UP] = 50;
+        adjacencies[50][DOWN] = id;
+
+        // link into led-ring
+        adjacencies[id][DOWN] = 74;
+        adjacencies[74][UP] = id;
+
+        break;
+
+      case (id <= 67):
+        adjacencies[id][UP] = id - 9;
+        adjacencies[id - 9][DOWN] = id;
+        break;
+
+      }
+    })
+
+    // visualize LEDs + adjacencies
+    key_kbd_leds.forEach(({id, x, y}) => {
+      const SCALE = 60;
+      const OFFSET = 100;
+
+      adjacencies[id].forEach(id => {
+        if (id === 255) return;
+
+        const x2 = key_kbd_leds.find(e => e.id === id).x;
+        const y2 = key_kbd_leds.find(e => e.id === id).y;
+
+        ctx.beginPath();
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 2;
+        ctx.moveTo(OFFSET + x  * SCALE, OFFSET + -(y  * SCALE));
+        ctx.lineTo(OFFSET + x2 * SCALE, OFFSET + -(y2 * SCALE));
+        ctx.stroke();
+      })
+
+
+      draw_led(
+        id,
+        OFFSET + x * SCALE,
+        OFFSET + -(y * SCALE),
+        5,
+        `rgb(${id * 2}, ${255 - id * 2}, 0)`
+      );
+    })
+
+    // dump the adjacency data
+    let adjdata = `
+struct altsnake_adj {
+  uint8_t u, d, l, r;
+};
+
+const altsnake_adj altsnake_adj_data[] = {
+`;
+    for (let id = 1; id <= 105; id++) {
+      const [u, d, l, r] = adjacencies[id];
+      adjdata += `  { .u = ${u.toString().padStart(3, ' ')}, `;
+      adjdata +=     `.d = ${d.toString().padStart(3, ' ')}, `;
+      adjdata +=     `.l = ${l.toString().padStart(3, ' ')}, `;
+      adjdata +=     `.r = ${r.toString().padStart(3, ' ')} },\n`;
+    }
+    adjdata += `};`
+
+  </script>
+</body>
+</html>
