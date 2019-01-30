@@ -262,8 +262,15 @@ uint8_t led_per_run = 15;
 float breathe_mult;
 
 __attribute__ ((weak))
+bool led_matrix_run_user(void) {
+    return true;
+}
+
 void led_matrix_run(void)
 {
+    bool builtin_led = led_matrix_run_user();
+    if (!builtin_led) return;
+
     float ro;
     float go;
     float bo;

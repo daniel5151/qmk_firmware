@@ -76,7 +76,7 @@ void rgb_matrix_init_user(void) {
   led_cur_index = 0;
 }
 
-void led_matrix_run(void) {
+bool led_matrix_run_user(void) {
   uint8_t led_this_run = 0;
 
   if (led_cur == 0) { //Denotes start of new processing cycle in the case of chunked processing
@@ -92,6 +92,8 @@ void led_matrix_run(void) {
     led_cur_index++;
     led_this_run++;
   }
+
+  return false;
 }
 
 void rgb_matrix_record_key_press(keyrecord_t *record) {
