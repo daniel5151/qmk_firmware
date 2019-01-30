@@ -58,10 +58,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 // Runs just one time when the keyboard initializes.
-void matrix_init_user(void) {};
+void matrix_init_user(void) {}
 
 // Runs constantly in the background, in a loop.
-void matrix_scan_user(void) {};
+void matrix_scan_user(void) {}
 
 #define MODS_SHIFT (get_mods() & MOD_BIT(KC_LSHIFT) || get_mods() & MOD_BIT(KC_RSHIFT))
 #define MODS_CTRL  (get_mods() & MOD_BIT(KC_LCTL)   || get_mods() & MOD_BIT(KC_RCTRL))
@@ -70,12 +70,15 @@ void matrix_scan_user(void) {};
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   static uint32_t key_timer;
 
+  if (!rgb_matrix_process_record_user(keycode, record)) return false;
+
   switch (keycode) {
+    // Custom LED lighting modes
     case LED_SNK:
-      // TODO: find elegant way to switch to / from snake mode
+      rgb_matrix_set_mode(LED_SNAKE);
       return false;
 
-    // Built-in LED lighting modes
+    // Builtin LED lighting mode options
     case L_BRI:
       if (record->event.pressed) {
         if (LED_GCR_STEP > LED_GCR_MAX - gcr_desired) gcr_desired = LED_GCR_MAX;
