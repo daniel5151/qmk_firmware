@@ -26,10 +26,8 @@ static alt_led_mode_t led_matrix_mode = LED_BUILTIN;
 /*----------------------------------  Util  ----------------------------------*/
 
 static uint8_t prng(void) {
-  static uint8_t seed = 4; // chosen by fair dice roll
-  uint8_t out = seed >> 1;
-  if (seed & 1) seed = out ^ 0xB8;
-  return seed;
+  static uint8_t x = 4; // chosen by fair dice roll
+  return x += (x * x) | 5;
 }
 
 static void set_led_cur_rgb(uint8_t r, uint8_t g, uint8_t b) {
@@ -69,31 +67,25 @@ static void snk_init(void) {
   snk.body[0] = (snk_pos_t){2, 2}; // start from the S key ;)
   snk.apple = (snk_pos_t){2, 5}; // spawn apple to the right
 
-  // Set initial led states
   for (int i = 0; i < ISSI3733_LED_COUNT; i++)
     snk.led_states[i] = SNK_EMPTY;
-  snk.led_states[KEY_TO_LED_MAP[2][2]] = SNK_BODY;
-  snk.led_states[KEY_TO_LED_MAP[2][5]] = SNK_APPLE;
 }
 
 static void snk_update_state(void) {
   // make room for new head
-  for (int i = 0; i < snk.len; i++)
+  for (int i = snk.len - 1; i >= 0; i--)
     snk.body[i + 1] = snk.body[i];
+
   // move snake's head
   snk.body[0].row += snk.delta.row;
   snk.body[0].col += snk.delta.col;
-
-  // TODO?
-  // led 74 is the closest underglow led to the Space led (61).
-  // The underglow is a loop of leds from 65-104
-  // Maybe allow the snake to "sneak" onto the underglow as an easter egg?
 
   // wrap snake around edges
   if (snk.body[0].row == 255)         snk.body[0].row = MATRIX_ROWS - 1;
   if (snk.body[0].col == 255)         snk.body[0].col = MATRIX_COLS - 1;
   if (snk.body[0].row == MATRIX_ROWS) snk.body[0].row = 0;
   if (snk.body[0].col == MATRIX_COLS) snk.body[0].col = 0;
+
   // check for self-collision
   for (int i = 1; i < snk.len; i++) {
     if (snk.body[i].row == snk.body[0].row &&
@@ -103,21 +95,24 @@ static void snk_update_state(void) {
       return;
     }
   }
+
   // check for apple collision
   if (snk.apple.row == snk.body[0].row &&
       snk.apple.col == snk.body[0].col) {
     snk.len++;
     // spawn new apple
-    snk.apple.row = prng() % MATRIX_ROWS;
-    snk.apple.col = prng() % MATRIX_COLS;
-    // turn on new apple led
-    snk.led_states[KEY_TO_LED_MAP[snk.apple.row][snk.apple.col]] = SNK_APPLE;
+    do {
+      snk.apple.row = prng() % MATRIX_ROWS;
+      snk.apple.col = prng() % MATRIX_COLS;
+    } while (KEY_TO_LED_MAP[snk.apple.row][snk.apple.col] == 255);
   }
 
-  // turn on new head led
-  snk.led_states[KEY_TO_LED_MAP[snk.body[0].row][snk.body[0].col]] = SNK_BODY;
-  // turn off old tail led
-  snk.led_states[KEY_TO_LED_MAP[snk.body[snk.len].row][snk.body[snk.len].col]] = SNK_EMPTY;
+  // update LEDs
+  for (int i = 0; i < ISSI3733_LED_COUNT; i++)
+    snk.led_states[i] = SNK_EMPTY;
+  for (int i = 0; i < snk.len; i++)
+    snk.led_states[KEY_TO_LED_MAP[snk.body[i].row][snk.body[i].col]] = SNK_BODY;
+  snk.led_states[KEY_TO_LED_MAP[snk.apple.row][snk.apple.col]] = SNK_APPLE;
 }
 
 static void snk_run(void) {
@@ -127,7 +122,7 @@ static void snk_run(void) {
   }
 
   // check if it's time to run a game state update
-  const uint16_t speed = max(100, 1000 - snk.len * 100);
+  const uint16_t speed = max(100, 600 - snk.len * 100);
   if (timer_elapsed(snk.update_timer) > speed) {
     snk.update_timer = timer_read();
     snk_update_state();
@@ -161,7 +156,7 @@ static bool snk_process_record_user(uint16_t keycode, keyrecord_t* record) {
 
   // you probably don't want the keys to "work" while playing snake, but if you
   // do, switch this to `true`
-  return false;
+  return true;
 }
 
 /*---------------------------  Overriden functions ---------------------------*/
@@ -182,7 +177,14 @@ bool led_matrix_run_user(void) {
 
 /*-----------------  Exposed functions (for use in keymap.c)  ----------------*/
 
-void rgb_matrix_set_mode(alt_led_mode_t mode) { led_matrix_mode = mode; }
+void rgb_matrix_set_mode(alt_led_mode_t mode) {
+  led_matrix_mode = mode;
+  switch (led_matrix_mode) {
+  case LED_SNAKE: snk_init(); break;
+  default: break;
+  }
+}
+
 bool rgb_matrix_process_record_user(uint16_t keycode, keyrecord_t* record) {
   (void)prng(); // cycle the rng
 
