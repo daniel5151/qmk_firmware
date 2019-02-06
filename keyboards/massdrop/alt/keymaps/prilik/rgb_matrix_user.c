@@ -1,5 +1,7 @@
 #include "rgb_matrix_user.h"
 
+#include <math.h>
+
 #include "quantum.h"
 #include "led_matrix.h"
 
@@ -39,10 +41,24 @@ static void set_led_cur_rgb(uint8_t r, uint8_t g, uint8_t b) {
 /*-------------------------------  Snake Game  -------------------------------*/
 
 typedef enum {
-  SNK_EMPTY = 0,
-  SNK_BODY,
-  SNK_APPLE,
+  SNKC_EMPTY_T = 0,
+  SNKC_BODY_T,
+  SNKC_APPLE_T,
+} snk_cell_tag_t;
+
+typedef struct {
+  union {
+    // Empty
+    // Body
+    uint8_t seg;
+    // Apple
+  };
+  snk_cell_tag_t tag;
 } snk_cell_t;
+
+#define SNK_EMPTY      (snk_cell_t){{0},   SNKC_EMPTY_T}
+#define SNK_BODY(seg)  (snk_cell_t){{seg}, SNKC_BODY_T}
+#define SNK_APPLE      (snk_cell_t){{0},   SNKC_APPLE_T}
 
 typedef struct {
   uint8_t row, col;
@@ -56,7 +72,7 @@ static struct {
   snk_pos_t body[67];
   snk_pos_t apple;
 
-  uint8_t led_states[ISSI3733_LED_COUNT];
+  snk_cell_t led_states[ISSI3733_LED_COUNT];
 } snk = {0};
 
 static void snk_init(void) {
@@ -111,7 +127,7 @@ static void snk_update_state(void) {
   for (int i = 0; i < ISSI3733_LED_COUNT; i++)
     snk.led_states[i] = SNK_EMPTY;
   for (int i = 0; i < snk.len; i++)
-    snk.led_states[KEY_TO_LED_MAP[snk.body[i].row][snk.body[i].col]] = SNK_BODY;
+    snk.led_states[KEY_TO_LED_MAP[snk.body[i].row][snk.body[i].col]] = SNK_BODY(i);
   snk.led_states[KEY_TO_LED_MAP[snk.apple.row][snk.apple.col]] = SNK_APPLE;
 }
 
@@ -122,7 +138,7 @@ static void snk_run(void) {
   }
 
   // check if it's time to run a game state update
-  const uint16_t speed = max(100, 600 - snk.len * 100);
+  const uint16_t speed = max(100, 300 - snk.len * 20);
   if (timer_elapsed(snk.update_timer) > speed) {
     snk.update_timer = timer_read();
     snk_update_state();
@@ -131,10 +147,26 @@ static void snk_run(void) {
   // update leds based off game state
   uint8_t led_this_run = 0;
   while (led_cur < lede && led_this_run < led_per_run) {
-    switch(snk.led_states[led_cur->id - 1]) {
-    case SNK_EMPTY: set_led_cur_rgb(0x00, 0x00, 0x00); break;
-    case SNK_BODY:  set_led_cur_rgb(0x00, 0x00, 0xFF); break;
-    case SNK_APPLE: set_led_cur_rgb(0x00, 0xFF, 0x00); break;
+    const snk_cell_t cell = snk.led_states[led_cur->id - 1];
+    switch(cell.tag) {
+    case SNKC_EMPTY_T:
+      set_led_cur_rgb(
+        0x00,
+        0x00,
+        0x00
+      ); break;
+    case SNKC_BODY_T:
+      set_led_cur_rgb(
+        sin(cell.seg * 0.5 + 0) * 127 + 128,
+        sin(cell.seg * 0.5 + 2) * 127 + 128,
+        sin(cell.seg * 0.5 + 4) * 127 + 128
+      ); break;
+    case SNKC_APPLE_T:
+      set_led_cur_rgb(
+        0x00,
+        0xFF,
+        0x00
+      ); break;
     }
 
     led_cur++;
@@ -143,16 +175,28 @@ static void snk_run(void) {
 }
 
 static bool snk_process_record_user(uint16_t keycode, keyrecord_t* record) {
+  static uint16_t last_keycode = 0;
+
+  // prevent reversing into yourself
+  if (
+    (keycode == KC_UP && last_keycode == KC_DOWN) ||
+    (keycode == KC_DOWN && last_keycode == KC_UP) ||
+    (keycode == KC_LEFT && last_keycode == KC_RGHT) ||
+    (keycode == KC_RGHT && last_keycode == KC_LEFT)
+  ) return true;
+
   switch (keycode) {
   // Snake direction
-  case KC_UP:   snk.delta.row = -1; snk.delta.col =  0; break;
-  case KC_LEFT: snk.delta.row =  0; snk.delta.col = -1; break;
-  case KC_DOWN: snk.delta.row =  1; snk.delta.col =  0; break;
-  case KC_RGHT: snk.delta.row =  0; snk.delta.col =  1; break;
+  case KC_UP:   snk.delta = (snk_pos_t){-1,  0}; break;
+  case KC_LEFT: snk.delta = (snk_pos_t){ 0, -1}; break;
+  case KC_DOWN: snk.delta = (snk_pos_t){ 1,  0}; break;
+  case KC_RGHT: snk.delta = (snk_pos_t){ 0,  1}; break;
   // Exit snake mode
   case KC_ESC:  rgb_matrix_set_mode(LED_BUILTIN); break;
   default: break;
   }
+
+  last_keycode = keycode;
 
   // you probably don't want the keys to "work" while playing snake, but if you
   // do, switch this to `true`
