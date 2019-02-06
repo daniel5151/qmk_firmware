@@ -32,6 +32,12 @@ led_setup_t leds_yellow[] = {
     { .end = 1 },
 };
 
+//Yellow
+led_setup_t leds_orange[] = {
+    { .hs = 0, .he = 100, .rs = 255, .re = 255, .gs = 100, .ge = 100, .bs = 0, .be = 0, .ef = EF_NONE },
+    { .end = 1 },
+};
+
 //Off
 led_setup_t leds_off[] = {
     { .hs = 0, .he = 100, .rs = 0, .re = 0, .gs = 0, .ge = 0, .bs = 0, .be = 0, .ef = EF_NONE },
@@ -104,11 +110,12 @@ led_setup_t leds_rainbow_s[] = {
 //Add the new animation name to the list below following its format
 
 void *led_setups[] = {
+    leds_orange,
     leds_rainbow_s,
     leds_rainbow_ns,
     leds_teal_salmon,
-    leds_yellow,
     leds_red,
+    leds_yellow,
     leds_green,
     leds_blue,
     leds_white,
