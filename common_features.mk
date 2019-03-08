@@ -143,6 +143,7 @@ endif
     SRC += $(QUANTUM_DIR)/color.c
     SRC += $(QUANTUM_DIR)/rgb_matrix.c
     SRC += $(QUANTUM_DIR)/rgb_matrix_drivers.c
+    SRC += $(QUANTUM_DIR)/rgb_matrix_custom_effects.c
     CIE1931_CURVE = yes
 endif
 

@@ -209,11 +209,10 @@ static void rgb_matrix_snake(uint16_t led_i, bool init) {
 
 /*---------------------------------  Export  ---------------------------------*/
 
-static const rgb_matrix_custom_mode_f custom_modes[] = {
+const rgb_matrix_effect_f rgb_matrix_effects_user[] = {
     rgb_matrix_outrun,
     rgb_matrix_snake,
 };
 
 // override null-defns in rgb_matrix.c
-const rgb_matrix_custom_mode_f* rgb_matrix_custom_modes = custom_modes;
-const uint8_t rgb_matrix_custom_modes_count = sizeof(custom_modes) / sizeof(custom_modes[0]);
+const uint8_t rgb_matrix_effects_user_count = sizeof(rgb_matrix_effects_user) / sizeof(rgb_matrix_effects_user[0]);

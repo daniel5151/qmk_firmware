@@ -88,8 +88,7 @@ enum rgb_matrix_effects {
        RGB_MATRIX_SOLID_MULTISPLASH,
    #endif
 #endif
-    RGB_MATRIX_CUSTOM,
-    RGB_MATRIX_EFFECT_MAX
+    RGB_MATRIX_CUSTOM
 };
 
 // Expose built-in effects
@@ -243,6 +242,9 @@ void rgb_matrix_indicators_kb(uint16_t led_i);
 void rgb_matrix_indicators_user(uint16_t led_i);
 
 // Custom Mode support
-typedef void (*rgb_matrix_custom_mode_f)(uint16_t led_i, bool init);
-extern const rgb_matrix_custom_mode_f* rgb_matrix_custom_modes;
-extern const uint8_t rgb_matrix_custom_modes_count;
+typedef void (*rgb_matrix_effect_f)(uint16_t led_i, bool init);
+extern const rgb_matrix_effect_f rgb_matrix_effects_kb[];
+extern const rgb_matrix_effect_f rgb_matrix_effects_user[];
+extern const uint8_t rgb_matrix_effects_kb_count;
+extern const uint8_t rgb_matrix_effects_user_count;
+
