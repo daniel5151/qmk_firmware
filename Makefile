@@ -20,7 +20,10 @@ endif
 override SILENT := false
 
 ifndef SUB_IS_SILENT
-QMK_VERSION := $(shell git describe --abbrev=0 --tags 2>/dev/null)
+ifndef SKIP_GIT
+    QMK_VERSION := $(shell git describe --abbrev=0 --tags 2>/dev/null)
+endif
+
 ifneq ($(QMK_VERSION),)
 $(info QMK Firmware $(QMK_VERSION))
 endif
@@ -94,6 +97,7 @@ $(eval $(call NEXT_PATH_ELEMENT))
 # endif
 
 define GET_KEYBOARDS
+ifndef ALT_GET_KEYBOARDS
     All_RULES_MK := $$(patsubst $(ROOT_DIR)/keyboards/%/rules.mk,%,$$(wildcard $(ROOT_DIR)/keyboards/*/rules.mk))
     All_RULES_MK += $$(patsubst $(ROOT_DIR)/keyboards/%/rules.mk,%,$$(wildcard $(ROOT_DIR)/keyboards/*/*/rules.mk))
     All_RULES_MK += $$(patsubst $(ROOT_DIR)/keyboards/%/rules.mk,%,$$(wildcard $(ROOT_DIR)/keyboards/*/*/*/rules.mk))
@@ -105,6 +109,9 @@ define GET_KEYBOARDS
     KEYMAPS_MK += $$(patsubst $(ROOT_DIR)/keyboards/%/rules.mk,%,$$(wildcard $(ROOT_DIR)/keyboards/*/*/*/*/keymaps/*/rules.mk))
 
     KEYBOARDS := $$(sort $$(filter-out $$(KEYMAPS_MK), $$(All_RULES_MK)))
+else
+    KEYBOARDS := $(shell find keyboards/ -type f -iname "rules.mk" | grep -v keymaps | sed 's!keyboards/\(.*\)/rules.mk!\1!' | sort | uniq)
+endif
 endef
 
 $(eval $(call GET_KEYBOARDS))
@@ -534,11 +541,14 @@ endef
 %:
 	# Check if we have the CMP tool installed
 	cmp $(ROOT_DIR)/Makefile $(ROOT_DIR)/Makefile >/dev/null 2>&1; if [ $$? -gt 0 ]; then printf "$(MSG_NO_CMP)"; exit 1; fi;
+	# Ensure that python3 is installed. This check can be removed after python is used in more places.
+	if ! python3 --version 1> /dev/null 2>&1; then printf "$(MSG_PYTHON_MISSING)"; fi
 	# Check if the submodules are dirty, and display a warning if they are
 ifndef SKIP_GIT
 	if [ ! -e lib/chibios ]; then git submodule sync lib/chibios && git submodule update --depth 1 --init lib/chibios; fi
 	if [ ! -e lib/chibios-contrib ]; then git submodule sync lib/chibios-contrib && git submodule update --depth 1 --init lib/chibios-contrib; fi
 	if [ ! -e lib/ugfx ]; then git submodule sync lib/ugfx && git submodule update --depth 1 --init lib/ugfx; fi
+	if [ ! -e lib/lufa ]; then git submodule sync lib/lufa && git submodule update --depth 1 --init lib/lufa; fi
 	git submodule status --recursive 2>/dev/null | \
 	while IFS= read -r x; do \
 		case "$$x" in \

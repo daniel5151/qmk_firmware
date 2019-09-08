@@ -35,7 +35,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MATRIX_ROW_PINS { B3, B4, A0, A2, A4, A3 }
 #define DIODE_DIRECTION COL2ROW
 
-#define NUMBER_OF_ENCODERS 1
 #define ENCODERS_PAD_A { B9 }
 #define ENCODERS_PAD_B { B8 }
 
@@ -76,7 +75,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Bump this every time we change what we store
 // This will automatically reset the EEPROM with defaults
 // and avoid loading invalid data from the EEPROM
-#define EEPROM_VERSION 0x0F
+#define EEPROM_VERSION 0x01
 #define EEPROM_VERSION_ADDR 34
 
 // Dynamic keymap starts after EEPROM version
