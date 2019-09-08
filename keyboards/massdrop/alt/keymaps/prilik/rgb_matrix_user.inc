@@ -1,70 +1,72 @@
-RGB_MATRIX_EFFECT(reactive_gradient)
-// RGB_MATRIX_EFFECT(rgb_matrix_snake)
+// RGB_MATRIX_EFFECT(reactive_gradient)
+// // RGB_MATRIX_EFFECT(rgb_matrix_snake)
 
-#ifdef RGB_MATRIX_CUSTOM_EFFECT_IMPLS
+// #ifdef RGB_MATRIX_CUSTOM_EFFECT_IMPLS
 
-#include "rgb_matrix.h"
+// #include "rgb_matrix.h"
+// #include "rgb_matrix_types.h"
+// #include "color.h"
 
-#include <math.h>
-#define max(a, b) (((a) > (b)) ? (a) : (b))
-#define min(a, b) (((a) < (b)) ? (a) : (b))
+// #include <math.h>
+// #define max(a, b) (((a) > (b)) ? (a) : (b))
+// #define min(a, b) (((a) < (b)) ? (a) : (b))
 
-/*---------------------------------  Outrun  ---------------------------------*/
+// /*---------------------------------  Outrun  ---------------------------------*/
 
-const uint8_t FADEOUT_SPEED = 120; // personal preference
+// const uint8_t FADEOUT_SPEED = 120; // personal preference
 
-static bool reactive_gradient(effect_params_t* params) {
-  RGB_MATRIX_USE_LIMITS(led_min, led_max);
+// static bool reactive_gradient(effect_params_t* params) {
+//   RGB_MATRIX_USE_LIMITS(led_min, led_max);
 
-  const uint16_t max_tick = 65535 / FADEOUT_SPEED;
+//   const uint16_t max_tick = 65535 / FADEOUT_SPEED;
 
-  // calculate target color
-  const HSV hsv = {
-    rgb_matrix_config.hue + 80,
-    rgb_matrix_config.sat,
-    rgb_matrix_config.val
-  };
-  const RGB highlight = hsv_to_rgb(hsv);
+//   // calculate target color
+//   const HSV hsv = {
+//     rgb_matrix_config.hsv.h + 80,
+//     rgb_matrix_config.hsv.s,
+//     rgb_matrix_config.hsv.v
+//   };
+//   const RGB highlight = hsv_to_rgb(hsv);
 
-  // Relies on hue being 8-bit and wrapping
-  for (uint8_t i = led_min; i < led_max; i++) {
-    // get gradient color
-    const rgb_led led = g_rgb_leds[i];
-    uint8_t hue = rgb_matrix_config.hue;
-    if (led.matrix_co.raw != 0xFF) {
-      // Keys
-      hue += 10 * led.matrix_co.row;
-    } else {
-      // Underglow (same color as last row of keys)
-      hue += 10 * (MATRIX_ROWS - 1);
-    }
+//   // Relies on hue being 8-bit and wrapping
+//   for (uint8_t i = led_min; i < led_max; i++) {
+//     // get gradient color
+//     const rgb_led led = g_rgb_leds[i];
+//     uint8_t hue = rgb_matrix_config.hsv.h;
+//     if (led.matrix_co.raw != 0xFF) {
+//       // Keys
+//       hue += 10 * led.matrix_co.row;
+//     } else {
+//       // Underglow (same color as last row of keys)
+//       hue += 10 * (MATRIX_ROWS - 1);
+//     }
 
-    HSV hsv = { hue, 0xFF, rgb_matrix_config.val };
-    RGB rgb = hsv_to_rgb(hsv);
+//     HSV hsv = { hue, 0xFF, rgb_matrix_config.hsv.v };
+//     RGB rgb = hsv_to_rgb(hsv);
 
-    // checks if key has been hit
-    uint16_t tick = 0xffff;
-    for(uint8_t j = g_last_hit_tracker.count; j > 0; j--) {
-      if (g_last_hit_tracker.index[j - 1] == i) {
-        tick = g_last_hit_tracker.tick[j - 1];
-        break;
-      }
-    }
-    // scale the tick down based on fadeout preferences
-    tick = scale16by8(tick, FADEOUT_SPEED);
-    // Linear interpolate through RGB space
-    if (tick < max_tick) {
-      float pct = tick / (float)max_tick;
-      rgb.r = highlight.r - pct * (highlight.r - rgb.r);
-      rgb.g = highlight.g - pct * (highlight.g - rgb.g);
-      rgb.b = highlight.b - pct * (highlight.b - rgb.b);
-    }
+//     // checks if key has been hit
+//     uint16_t tick = 0xffff;
+//     for(uint8_t j = g_last_hit_tracker.count; j > 0; j--) {
+//       if (g_last_hit_tracker.index[j - 1] == i) {
+//         tick = g_last_hit_tracker.tick[j - 1];
+//         break;
+//       }
+//     }
+//     // scale the tick down based on fadeout preferences
+//     tick = scale16by8(tick, FADEOUT_SPEED);
+//     // Linear interpolate through RGB space
+//     if (tick < max_tick) {
+//       float pct = tick / (float)max_tick;
+//       rgb.r = highlight.r - pct * (highlight.r - rgb.r);
+//       rgb.g = highlight.g - pct * (highlight.g - rgb.g);
+//       rgb.b = highlight.b - pct * (highlight.b - rgb.b);
+//     }
 
-    rgb_matrix_set_color(i, rgb.r, rgb.g, rgb.b);
-  }
+//     rgb_matrix_set_color(i, rgb.r, rgb.g, rgb.b);
+//   }
 
-  return led_max < DRIVER_LED_TOTAL;
-}
+//   return led_max < DRIVER_LED_TOTAL;
+// }
 
 /*----------------------------------  Snake  ---------------------------------*/
 
@@ -235,4 +237,4 @@ static bool reactive_gradient(effect_params_t* params) {
 //   else snk_run(params);
 // }
 
-#endif // RGB_MATRIX_CUSTOM_EFFECT_IMPLS
+// #endif // RGB_MATRIX_CUSTOM_EFFECT_IMPLS
