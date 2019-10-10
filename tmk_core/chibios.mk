@@ -168,6 +168,8 @@ ASFLAGS += $(THUMBFLAGS)
 CPPFLAGS += $(COMPILEFLAGS)
 CPPFLAGS += -fno-rtti
 
+RUSTFLAGS += --target thumbv7em-none-eabi -C target-cpu=$(MCU)
+
 LDFLAGS +=-Wl,--gc-sections
 LDFLAGS +=-Wl,--no-wchar-size-warning
 LDFLAGS += -mno-thumb-interwork -mthumb

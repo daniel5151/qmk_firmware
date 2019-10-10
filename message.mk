@@ -51,6 +51,7 @@ MSG_SYMBOL_TABLE = Creating Symbol Table:
 MSG_LINKING = Linking:
 MSG_COMPILING = Compiling:
 MSG_COMPILING_CPP = Compiling:
+MSG_COMPILING_RUST = Compiling:
 MSG_ASSEMBLING = Assembling:
 MSG_CLEANING = Cleaning project:
 MSG_CREATING_LIBRARY = Creating library:
