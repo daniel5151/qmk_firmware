@@ -370,6 +370,9 @@ $1/%.a : $1/%.o
 
 $1/force:
 
+$1/preprocessor.txt: $1/force
+	echo '$$($1_DEFS) $$($1_INCFLAGS) $$($1_CONFIG_FLAGS)' | cmp -s - $$@ || echo '$$($1_DEFS) $$($1_INCFLAGS) $$($1_CONFIG_FLAGS)' > $$@
+
 $1/cflags.txt: $1/force
 	echo '$$($1_CFLAGS)' | cmp -s - $$@ || echo '$$($1_CFLAGS)' > $$@
 
@@ -382,7 +385,7 @@ $1/rustflags.txt: $1/force
 $1/asflags.txt: $1/force
 	echo '$$($1_ASFLAGS)' | cmp -s - $$@ || echo '$$($1_ASFLAGS)' > $$@
 
-$1/compiler.txt: $1/force
+$1/compiler.txt: $1/force $1/preprocessor.txt
 	$$(CC) --version | cmp -s - $$@ || $$(CC) --version > $$@
 endef
 
