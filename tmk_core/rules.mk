@@ -148,6 +148,13 @@ RUSTFLAGS += -W rust-2018-idioms
 #     RUSTFLAGS += -D warnings
 # endif
 
+ifdef RUSTCRATE
+OBJ += $(KEYMAP_PATH)/$(RUSTCRATE)/target/thumbv7em-none-eabi/release/lib$(RUSTCRATE).a
+EXTRALDFLAGS += -L$(KEYMAP_PATH)/$(RUSTCRATE)/target/thumbv7em-none-eabi/release/ -l$(RUSTCRATE)
+$(KEYMAP_PATH)/$(RUSTCRATE)/target/thumbv7em-none-eabi/release/lib$(RUSTCRATE).a:
+	(cd $(KEYMAP_PATH)/$(RUSTCRATE)/ && cargo build --release)
+endif
+
 #---------------- Assembler Options ----------------
 #  -Wa,...:   tell GCC to pass this to the assembler.
 #  -adhlns:   create listing
