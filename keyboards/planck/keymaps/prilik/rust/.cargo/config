@@ -1,0 +1,5 @@
+[target.thumbv7em-none-eabi]
+
+[build]
+target = "thumbv7em-none-eabi"
+rustflags = ["-C", "target-cpu=cortex-m4"]

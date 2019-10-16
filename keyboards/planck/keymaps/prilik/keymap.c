@@ -6,12 +6,11 @@
 #include "process_unicode.h"
 
 enum planck_keycodes {
-  RGB_SLD = EZ_SAFE_RANGE,
+  UNUSED = EZ_SAFE_RANGE,
 
   WIDETXT, // w i d e t e x t   f o r   a   w i d e   b o y
   TAUNTXT, // FoR ThE UlTiMaTe sHiTpOsTiNg eXpErIeNcE
 
-  UC_HELP, // URL for QMK unicode help
   UC_SHRG,                // shrug       - ¯\_(ツ)_/¯
 #define UC_100  X(E_100)  // hundo       - 💯
 #define UC_BBB  X(E_BBB)  // dat B       - 🅱️
@@ -103,68 +102,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   */
 };
 
+bool process_record_user_rs(uint16_t keycode, keyrecord_t* record);
+
 bool process_record_user(uint16_t keycode, keyrecord_t* record) {
-  static struct {
-    bool on;
-    bool first;
-  } w_i_d_e_t_e_x_t = {false, false};
-
-  if (w_i_d_e_t_e_x_t.on) {
-    if (record->event.pressed) {
-      switch (keycode) {
-        case KC_A ... KC_0:
-        case KC_SPC:
-          if (w_i_d_e_t_e_x_t.first) {
-            w_i_d_e_t_e_x_t.first = false;
-          } else {
-            send_char(' ');
-          }
-          break;
-        case KC_ENT:
-          w_i_d_e_t_e_x_t.first = true;
-          break;
-        case KC_BSPC:
-          send_char('\b');  // backspace
-          break;
-      }
-    }
-  }
-
-  static bool tAuNtTeXt = false;
-
-  if (tAuNtTeXt) {
-    if (record->event.pressed) {
-      if (keycode != KC_SPC)
-        tap_code(KC_CAPS);
-    }
-  }
-
-  switch (keycode) {
-    case RGB_SLD:
-      if (record->event.pressed) {
-        rgblight_mode(1);
-      }
-      return false;
-    /* z e s t y   m e m e s */
-    case WIDETXT:
-      if (record->event.pressed) {
-        w_i_d_e_t_e_x_t.on = !w_i_d_e_t_e_x_t.on;
-        w_i_d_e_t_e_x_t.first = true;
-      }
-      return false;
-    case TAUNTXT:
-      if (record->event.pressed) {
-        tAuNtTeXt = !tAuNtTeXt;
-      }
-      return false;
-    /* Unicode */
-    case UC_SHRG:  // ¯\_(ツ)_/¯
-      if (record->event.pressed) {
-        send_unicode_hex_string("00AF 005C 005F 0028 30C4 0029 005F 002F 00AF");
-      }
-      return false;
-  }
-  return true;
+  return process_record_user_rs(keycode, record);
 }
 
 #ifdef AUDIO_ENABLE

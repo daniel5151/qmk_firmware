@@ -134,10 +134,11 @@ CPPFLAGS += -Wa,-adhlns=$(@:%.o=%.lst)
 #---------------- Compiler Options Rust ----------------
 #  -g:             generate debugging information
 #  -C opt-level=*: optimization level
+RUSTC = rustc +nightly
 ifndef SKIP_DEBUG_INFO
   RUSTFLAGS += -g
 endif
-RUSTFLAGS += $(CPPDEFS)
+RUSTFLAGS += --edition 2018
 RUSTFLAGS += -C opt-level=$(OPT)
 RUSTFLAGS += -W unused
 RUSTFLAGS += -W rust-2018-idioms
@@ -352,7 +353,7 @@ $1/%.o : %.cc $1/%.d $1/cppflags.txt $1/compiler.txt | $(BEGIN)
 $1/%.o : %.rs $1/%.d $1/rustflags.txt $1/compiler.txt | $(BEGIN)
 	@mkdir -p $$(@D)
 	@$(SILENT) || printf "$$(MSG_COMPILING_RUST) $$<" | $$(AWK_CMD)
-	$$(eval CMD=rustc --emit=obj,dep-info --color always $$($1_RUSTFLAGS) $$< --out-dir $$(dir $$@))
+	$$(eval CMD=$$(RUSTC) --emit=obj,dep-info --color always $$($1_RUSTFLAGS) $$< --out-dir $$(dir $$@))
 	@$$(BUILD_CMD)
 
 # Assemble: create object files from assembler source files.

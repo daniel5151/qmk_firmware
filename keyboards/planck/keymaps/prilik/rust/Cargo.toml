@@ -1,0 +1,20 @@
+[package]
+name = "rust"
+version = "0.1.0"
+authors = ["Daniel Prilik <danielprilik@gmail.com>"]
+edition = "2018"
+
+[workspace]
+members = ["qmk-sys"]
+
+[dependencies]
+qmk-sys = { path = "./qmk-sys" }
+
+[profile.release]
+codegen-units = 1 # better optimizations
+lto = true # better optimizations
+
+[lib]
+crate-type = ["staticlib"]
+test = false
+bench = false
