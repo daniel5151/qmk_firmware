@@ -4,17 +4,18 @@ use qmk_sys::bindgen::{
     keyrecord_t, planck_ez_keycodes, send_char, send_unicode_hex_string, tap_code,
 };
 
+/// This is very danger.
 macro_rules! fn_local_mutable_static {
     (static mut $name:ident: $type:ty = $val:expr) => {
         #[allow(non_snake_case)]
-        let $name = {
+        let mut $name = {
             static mut THEVALUE: $type = $val;
             struct $name;
             impl $name {
                 pub fn get(&self) -> $type {
                     unsafe { THEVALUE }
                 }
-                pub fn set(&self, val: $type) {
+                pub fn set(&mut self, val: $type) {
                     unsafe {
                         THEVALUE = val;
                     }
@@ -89,14 +90,14 @@ fn widetext(keycode: u16, record: &keyrecord_t) -> bool {
                     if FIRST.get() {
                         FIRST.set(false);
                     } else {
-                        unsafe { send_char(' ' as u8) }
+                        unsafe { send_char(b' ') }
                     }
                 }
                 KC_ENTER => FIRST.set(true),
                 KC_BSPACE => {
                     // backspace char
                     unsafe {
-                        send_char('\x08' as u8);
+                        send_char(b'\x08');
                     }
                 }
                 _ => {}
