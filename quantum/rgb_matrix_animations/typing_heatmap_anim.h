@@ -1,5 +1,5 @@
 #if defined(RGB_MATRIX_FRAMEBUFFER_EFFECTS) && !defined(DISABLE_RGB_MATRIX_TYPING_HEATMAP)
-RGB_MATRIX_EFFECT(TYPING_HEATMAP)
+RGB_MATRIX_EFFECT(TYPING_HEATMAP, process_rgb_matrix_typing_heatmap(record))
 #    ifdef RGB_MATRIX_CUSTOM_EFFECT_IMPLS
 
 void process_rgb_matrix_typing_heatmap(keyrecord_t* record) {

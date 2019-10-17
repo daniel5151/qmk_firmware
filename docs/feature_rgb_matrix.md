@@ -290,15 +290,17 @@ To declare new effects, create a new `rgb_matrix_user/kb.inc` that looks somethi
 `rgb_matrix_kb.inc` should go in the root of the keyboard directory.
 
 ```C
-// !!! DO NOT ADD #pragma once !!! //
-
-// Step 1.
 // Declare custom effects using the RGB_MATRIX_EFFECT macro
 // (note the lack of semicolon after the macro!)
 RGB_MATRIX_EFFECT(my_cool_effect)
 RGB_MATRIX_EFFECT(my_cool_effect2)
 
-// Step 2.
+// if RGB_MATRIX_FRAMEBUFFER_EFFECTS is enabled, custom effects can make use of
+// the `rgb_frame_buffer` for storing LED state between calls, and process
+// incoming keypresses by defining a custom process function!
+RGB_MATRIX_EFFECT(my_superfancy_effect, process_my_superfancy_effect(record))
+// see the built in TYPING_HEATMAP effect for an example
+
 // Define effects inside the `RGB_MATRIX_CUSTOM_EFFECT_IMPLS` ifdef block
 #ifdef RGB_MATRIX_CUSTOM_EFFECT_IMPLS
 

@@ -41,7 +41,7 @@ const point_t k_rgb_matrix_center = RGB_MATRIX_CENTER;
 
 // ------------------------------------------
 // -----Begin rgb effect includes macros-----
-#define RGB_MATRIX_EFFECT(name)
+#define RGB_MATRIX_EFFECT(name, ...)
 #define RGB_MATRIX_CUSTOM_EFFECT_IMPLS
 
 #include "rgb_matrix_animations/rgb_matrix_effects.inc"
@@ -196,11 +196,32 @@ bool process_rgb_matrix(uint16_t keycode, keyrecord_t *record) {
     }
 #endif  // RGB_MATRIX_KEYREACTIVE_ENABLED
 
-#if defined(RGB_MATRIX_FRAMEBUFFER_EFFECTS) && !defined(DISABLE_RGB_MATRIX_TYPING_HEATMAP)
-    if (rgb_matrix_config.mode == RGB_MATRIX_TYPING_HEATMAP) {
-        process_rgb_matrix_typing_heatmap(record);
-    }
-#endif  // defined(RGB_MATRIX_FRAMEBUFFER_EFFECTS) && !defined(DISABLE_RGB_MATRIX_TYPING_HEATMAP)
+// ---------------------------------------------
+// -----Begin rgb effect switch case macros-----
+#if defined(RGB_MATRIX_FRAMEBUFFER_EFFECTS)
+#    define RGB_MATRIX_EFFECT(name, ...)                   \
+        if (rgb_matrix_config.mode == RGB_MATRIX_##name) { \
+            __VA_ARGS__;                                   \
+        }
+#    include "rgb_matrix_animations/rgb_matrix_effects.inc"
+#    undef RGB_MATRIX_EFFECT
+
+#    if defined(RGB_MATRIX_CUSTOM_KB) || defined(RGB_MATRIX_CUSTOM_USER)
+#        define RGB_MATRIX_EFFECT(name, ...)                          \
+            if (rgb_matrix_config.mode == RGB_MATRIX_CUSTOM_##name) { \
+                __VA_ARGS__;                                          \
+            }
+#        ifdef RGB_MATRIX_CUSTOM_KB
+#            include "rgb_matrix_kb.inc"
+#        endif
+#        ifdef RGB_MATRIX_CUSTOM_USER
+#            include "rgb_matrix_user.inc"
+#        endif
+#        undef RGB_MATRIX_EFFECT
+#    endif
+#endif  // defined(RGB_MATRIX_FRAMEBUFFER_EFFECTS)
+// -----End rgb effect switch case macros-------
+// ---------------------------------------------
 
     return true;
 }
@@ -323,8 +344,8 @@ static void rgb_task_render(uint8_t effect) {
 #    endif
 #    undef RGB_MATRIX_EFFECT
 #endif
-            // -----End rgb effect switch case macros-------
-            // ---------------------------------------------
+// -----End rgb effect switch case macros-------
+// ---------------------------------------------
 
         // Factory default magic value
         case UINT8_MAX: {
