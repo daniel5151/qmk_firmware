@@ -10,7 +10,6 @@ fn main() {
 
     // TODO: use environment variable!
     let qmk_base = "../../../../../../";
-
     let clang_flags = std::fs::read_to_string(format!(
         "{}.build/obj_planck_ez_prilik/preprocessor.txt",
         qmk_base
@@ -30,14 +29,7 @@ fn main() {
         .blacklist_item("FP_ZERO")
         .blacklist_function("__.*")
         .clang_arg(format!("-working-directory={}", qmk_base))
-        .clang_args(
-            (String::from(" ") + &clang_flags)
-                .trim()
-                .split(" -")
-                .skip(1)
-                .map(|s| s.replace("include ", "include"))
-                .map(|s| format!("-{}", s)),
-        )
+        .clang_args(clang_flags.trim().split(" "))
         .clang_arg("-Wno-invalid-pp-token")
         .generate()
         .expect("Unable to generate bindings");
