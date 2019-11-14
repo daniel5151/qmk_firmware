@@ -12,7 +12,14 @@ qmk-sys = { path = "./qmk-sys" }
 
 [profile.release]
 codegen-units = 1 # better optimizations
+debug = false
+debug-assertions = false
+incremental = false
 lto = true # better optimizations
+opt-level = 's'
+overflow-checks = false
+panic = "abort"
+rpath = false
 
 [lib]
 crate-type = ["staticlib"]
