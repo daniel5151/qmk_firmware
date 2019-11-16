@@ -19,6 +19,8 @@ enum planck_keycodes {
 #define UC_GRIM X(E_GRIM) // grimmace    - 😬
 #define UC_THNK X(E_THNK) // thinking    - 🤔
 #define UC_UGHH X(E_UGHH) // UGHHHHH     - 😩
+
+  ZORK,
 };
 
 enum unicode_names {
@@ -88,7 +90,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [_MEMES] = LAYOUT_planck_mit(
     ___X___, UC_100,  ___X___, UC_EYES, ___X___, UC_THNK, ___X___, UC_UGHH, ___X___, ___X___, ___X___, ___X___, \
     TAUNTXT, ___X___, UC_SHRG, ___X___, ___X___, UC_GRIM, ___X___, ___X___, ___X___, ___X___, ___X___, ___X___, \
-    ___X___, ___X___, ___X___, UC_CLAP, ___X___, UC_BBB,  ___X___, ___X___, ___X___, ___X___, ___X___, ___X___, \
+    ___X___, ZORK,    ___X___, UC_CLAP, ___X___, UC_BBB,  ___X___, ___X___, ___X___, ___X___, ___X___, ___X___, \
     UC_M_OS, UC_M_WC, UC_M_LN, ___X___, ___X___,      WIDETXT,     ___X___, ___X___, ___X___, ___X___, ___X___  \
   ),
 

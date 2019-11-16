@@ -4,27 +4,10 @@ use qmk_sys::bindgen::{
     keyrecord_t, planck_ez_keycodes, send_char, send_unicode_hex_string, tap_code,
 };
 
-/// This is very danger.
-macro_rules! fn_local_mutable_static {
-    (static mut $name:ident: $type:ty = $val:expr) => {
-        #[allow(non_snake_case)]
-        let mut $name = {
-            static mut THEVALUE: $type = $val;
-            struct $name;
-            impl $name {
-                pub fn get(&self) -> $type {
-                    unsafe { THEVALUE }
-                }
-                pub fn set(&mut self, val: $type) {
-                    unsafe {
-                        THEVALUE = val;
-                    }
-                }
-            }
-            $name
-        };
-    };
-}
+const WIDETEXT: u32 = planck_ez_keycodes::EZ_SAFE_RANGE as u32 + 1;
+const TAUNTEXT: u32 = planck_ez_keycodes::EZ_SAFE_RANGE as u32 + 2;
+const UC_SHRG: u32 = planck_ez_keycodes::EZ_SAFE_RANGE as u32 + 3;
+const ZORK_KEY: u32 = planck_ez_keycodes::EZ_SAFE_RANGE as u32 + 4;
 
 #[no_mangle]
 pub unsafe extern "C" fn process_record_user_rs(keycode: u16, record: *const keyrecord_t) -> bool {
@@ -32,6 +15,10 @@ pub unsafe extern "C" fn process_record_user_rs(keycode: u16, record: *const key
 }
 
 fn process_record_user(keycode: u16, record: &keyrecord_t) -> bool {
+    if !super::zork::zork(ZORK_KEY, keycode, record) {
+        return false;
+    }
+
     if !tauntext(keycode, record) {
         return false;
     }
@@ -61,8 +48,6 @@ fn tauntext(keycode: u16, record: &keyrecord_t) -> bool {
             }
         }
     }
-
-    const TAUNTEXT: u32 = planck_ez_keycodes::EZ_SAFE_RANGE as u32 + 2;
 
     match keycode as u32 {
         TAUNTEXT => {
@@ -105,8 +90,6 @@ fn widetext(keycode: u16, record: &keyrecord_t) -> bool {
         }
     }
 
-    const WIDETEXT: u32 = planck_ez_keycodes::EZ_SAFE_RANGE as u32 + 1;
-
     match keycode as u32 {
         WIDETEXT => {
             if record.event.pressed {
@@ -121,8 +104,6 @@ fn widetext(keycode: u16, record: &keyrecord_t) -> bool {
 }
 
 fn shrug(keycode: u16, record: &keyrecord_t) -> bool {
-    const UC_SHRG: u32 = planck_ez_keycodes::EZ_SAFE_RANGE as u32 + 3;
-
     match keycode as u32 {
         UC_SHRG => {
             if record.event.pressed {
