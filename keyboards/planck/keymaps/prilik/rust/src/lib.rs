@@ -5,7 +5,7 @@
 extern crate alloc;
 
 #[global_allocator]
-static ALLOCATOR: qmk_sys::MallocFreeAlloc = qmk_sys::MallocFreeAlloc;
+static ALLOCATOR: qmk_sys::malloc::MallocFreeAlloc = qmk_sys::malloc::MallocFreeAlloc;
 
 /// This is very danger.
 macro_rules! fn_local_mutable_static {

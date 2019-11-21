@@ -2,7 +2,8 @@ use core::alloc::{GlobalAlloc, Layout};
 
 #[alloc_error_handler]
 fn alloc_error(layout: Layout) -> ! {
-    // incredibly jank error message lmao.
+    // it's CURRENT_YEAR, if your keyboard isn't printing allocation errors,
+    // what are you even doing?
     unsafe {
         let mut buf = [0; 16];
         usize_to_buf(&mut buf, layout.size());
@@ -12,6 +13,7 @@ fn alloc_error(layout: Layout) -> ! {
     loop {}
 }
 
+/// Global Allocator that hooks into malloc/free
 pub struct MallocFreeAlloc;
 
 unsafe impl GlobalAlloc for MallocFreeAlloc {
