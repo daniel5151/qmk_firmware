@@ -148,11 +148,33 @@ RUSTFLAGS += -W rust-2018-idioms
 #     RUSTFLAGS += -D warnings
 # endif
 
-ifdef RUSTCRATE
-OBJ += $(KEYMAP_PATH)/$(RUSTCRATE)/target/thumbv7em-none-eabi/release/lib$(RUSTCRATE).a
-EXTRALDFLAGS += -L$(KEYMAP_PATH)/$(RUSTCRATE)/target/thumbv7em-none-eabi/release/ -l$(RUSTCRATE)
-$(KEYMAP_PATH)/$(RUSTCRATE)/target/thumbv7em-none-eabi/release/lib$(RUSTCRATE).a:
-	(cd $(KEYMAP_PATH)/$(RUSTCRATE)/ && cargo build --release)
+ifdef RUST_CRATE
+
+ifndef RUST_TOOLCHAIN
+	RUST_TOOLCHAIN = stable
+endif
+
+RUSTFLAGS = # reset rustflags (let the crate decide)
+
+RUST_CRATE_PATH = $(KEYMAP_PATH)/$(RUST_CRATE)
+RUST_RELEASE_PATH = $(KEYMAP_OUTPUT)/$(RUST_TARGET)/release
+# cargo emits .d files, but there doesn't seem to be a good way to include them...
+RUST_DEPS = $(shell find $(RUST_CRATE_PATH)/ -name \*.rs -print)
+
+$(RUST_RELEASE_PATH)/lib$(RUST_CRATE).a: $(RUST_DEPS)
+	KEYMAP_OUTPUT=$(KEYMAP_OUTPUT)                    \
+	QMK_KEYBOARD_H=$(QMK_KEYBOARD_H)                  \
+	RUST_QMK_HEADERS="$(RUST_QMK_HEADERS)"            \
+	cargo +$(RUST_TOOLCHAIN) build                    \
+		--release                                     \
+		--target=$(RUST_TARGET)                       \
+		--manifest-path=$(RUST_CRATE_PATH)/Cargo.toml \
+		--target-dir=$(KEYMAP_OUTPUT)
+
+# link resulting rust library with the rest of QMK
+OBJ += $(RUST_RELEASE_PATH)/lib$(RUST_CRATE).a
+EXTRALDFLAGS += -L$(RUST_RELEASE_PATH)/ -l$(RUST_CRATE)
+
 endif
 
 #---------------- Assembler Options ----------------

@@ -1,5 +1,9 @@
 SRC += muse.c
-RUSTCRATE = rust
+
+RUST_CRATE = rust
+RUST_TARGET = thumbv7em-none-eabi
+RUST_TOOLCHAIN = nightly # for alloc crate support
+RUST_QMK_HEADERS = # rgb_matrix.h eeprom.h
 
 # required for malloc
 EXTRALDFLAGS += -specs=nosys.specs
