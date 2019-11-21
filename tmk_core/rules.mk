@@ -162,6 +162,7 @@ RUST_RELEASE_PATH = $(KEYMAP_OUTPUT)/$(RUST_TARGET)/release
 RUST_DEPS = $(shell find $(RUST_CRATE_PATH)/ -name \*.rs -print)
 
 $(RUST_RELEASE_PATH)/lib$(RUST_CRATE).a: $(RUST_DEPS)
+	QMK_BASE_DIR=$(PWD)                               \
 	KEYMAP_OUTPUT=$(KEYMAP_OUTPUT)                    \
 	QMK_KEYBOARD_H=$(QMK_KEYBOARD_H)                  \
 	RUST_QMK_HEADERS="$(RUST_QMK_HEADERS)"            \

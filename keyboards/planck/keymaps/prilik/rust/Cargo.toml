@@ -4,11 +4,8 @@ version = "0.1.0"
 authors = ["Daniel Prilik <danielprilik@gmail.com>"]
 edition = "2018"
 
-[workspace]
-members = ["qmk-sys"]
-
 [dependencies]
-qmk-sys = { path = "./qmk-sys" }
+qmk-sys = { path = "../../../../../lib/rust/qmk-sys" }
 embcrusted = { git = "https://github.com/daniel5151/embcrusted.git" }
 
 [profile.release]
